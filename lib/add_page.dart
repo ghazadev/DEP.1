@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AddToDoPage extends StatefulWidget {
-  const AddToDoPage({super.key});
+  const AddToDoPage({Key? key}) : super(key: key);
 
   @override
   State<AddToDoPage> createState() => AddToDoPageState();
@@ -23,57 +23,39 @@ class AddToDoPageState extends State<AddToDoPage> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
-            // Set text color to white
           ),
         ),
       ),
-
-
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blueAccent, Colors.deepPurpleAccent],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: Colors.white,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            TextField(
+            SizedBox(height: 50),
+
+            _buildTextFieldWithShadow(
+              icon: Icons.title,
+              hintText: 'Title',
               controller: titleController,
-              decoration: InputDecoration(
-                hintText: 'Title',
-                hintStyle: TextStyle(color: Colors.white70,fontSize: 30),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white,), // Change underline color here
-                ),
-              ),
             ),
-
-
-            TextField(
+            SizedBox(height: 20),
+            _buildTextFieldWithShadow(
+              icon: Icons.description,
+              hintText: 'Description',
               controller: descriptionController,
-              decoration: const InputDecoration(
-                hintText: 'Description',
-                hintStyle: TextStyle(color: Colors.white70,fontSize: 30),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // Change underline color here
-                ),
-
-              ),
-              keyboardType: TextInputType.multiline,
-              minLines: 4,
               maxLines: 6,
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: 40),
             ElevatedButton(
+
               onPressed: submitData,
               style: ButtonStyle(
-                minimumSize: MaterialStateProperty.all(Size(20, 50)), // Adjust width and height as needed
+
+                minimumSize: MaterialStateProperty.all(Size(10, 50)),
                 backgroundColor: MaterialStateProperty.all(Colors.deepPurple),
+
               ),
-              child: const Text(
+              child: Text(
                 'Submit',
                 style: TextStyle(
                   fontSize: 20,
@@ -81,37 +63,46 @@ class AddToDoPageState extends State<AddToDoPage> {
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 
-  void showSuccessMessage(BuildContext context, String message) {
-    final snackBar = SnackBar(
-      content: Text(
-        message,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
+  Widget _buildTextFieldWithShadow({
+    required IconData icon,
+    required String hintText,
+    required TextEditingController controller,
+    int maxLines = 1,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        color: Colors.grey[200],
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(0, 10),
+            blurRadius: 50,
+            color: Colors.blueAccent,
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        style: TextStyle(color: Colors.black87),
+        decoration: InputDecoration(
+          icon: Icon(icon, color: Colors.indigo),
+          hintText: hintText,
+          hintStyle: TextStyle(color: Colors.grey),
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
         ),
-      ),
-      backgroundColor: Colors.green, // Keep the SnackBar background color as it was
-      duration: Duration(seconds: 2), // Adjust duration as needed
-      behavior: SnackBarBehavior.floating, // Use floating behavior for better visibility
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Optional: Add rounded corners
-      ),
-      action: SnackBarAction(
-        label: 'Close', // Optional: Add a close action
-        onPressed: () {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        },
+        keyboardType: TextInputType.multiline,
+        maxLines: maxLines,
       ),
     );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future<void> submitData() async {
@@ -131,35 +122,52 @@ class AddToDoPageState extends State<AddToDoPage> {
       final response = await http.post(
         uri,
         body: jsonEncode(body),
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 201) {
         titleController.text = '';
         descriptionController.text = '';
-        print('Creation success');
-        showSuccessMessage(context, 'Creation success');
+        showSuccessMessage(context, 'To-Do item added successfully');
       } else {
-        print('Creation failed');
-        print(response.body);
-        showErrorMessage(context, 'Creation failed: ${response.body}');
+        showErrorMessage(context, 'Failed to add To-Do item: ${response.body}');
       }
     } catch (e) {
-      print('Error: $e');
       showErrorMessage(context, 'Error: $e');
     }
   }
-}
 
-void showErrorMessage(BuildContext context, String message) {
-  final snackBar = SnackBar(
-    content: Text(
-      message,
-      style: TextStyle(color: Colors.white, fontSize: 20),
-    ),
-    backgroundColor: Colors.red,
-  );
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  void showSuccessMessage(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(color: Colors.white, fontSize: 20),
+      ),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      action: SnackBarAction(
+        label: 'Close',
+        onPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void showErrorMessage(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(color: Colors.white, fontSize: 20),
+      ),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 }
