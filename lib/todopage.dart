@@ -1,8 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:to_do_list_app1/add_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart'; // Import for date formatting
+import 'package:to_do_list_app1/add_page.dart'; // Adjust import based on your project structure
+import 'package:to_do_list_app1/login_screen.dart'; // Adjust import based on your project structure
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({Key? key}) : super(key: key);
@@ -12,6 +13,10 @@ class TodoListPage extends StatefulWidget {
 }
 
 class TodoListPageState extends State<TodoListPage> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+
   bool isLoading = true;
   List items = [];
 
@@ -25,7 +30,17 @@ class TodoListPageState extends State<TodoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginScreen()),
+            );
+          },
+        ),
         title: const Text("To Do List"),
+        backgroundColor: Colors.deepPurple,
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -37,40 +52,173 @@ class TodoListPageState extends State<TodoListPage> {
             final item = items[index];
             final id = item['_id'];
 
-            return ListTile(
-              leading: CircleAvatar(child: Text('${index + 1}')),
-              title: Text(item['title']),
-              subtitle: Text(item['description']),
-              trailing: PopupMenuButton(
-                onSelected: (value) {
-                  if (value == 'Edit') {
-                    // Implement edit functionality if needed
-                  } else if (value == 'Delete') {
-                    deleteById(id);
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    child: Text('Edit'),
-                    value: 'Edit',
+            return Dismissible(
+              key: Key(id),
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(Icons.delete, color: Colors.white),
+              ),
+              secondaryBackground: Container(
+                color: Colors.green,
+                alignment: Alignment.centerRight,
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(Icons.check, color: Colors.white),
+              ),
+              confirmDismiss: (direction) {
+                if (direction == DismissDirection.startToEnd) {
+                  return showDeleteConfirmationDialog(context, id);
+                } else if (direction == DismissDirection.endToStart) {
+                  markTaskAsCompleted(item);
+                  return Future.value(false); // Don't dismiss the item
+                }
+                return Future.value(false);
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueAccent, Colors.deepPurpleAccent],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
                   ),
-                  PopupMenuItem(
-                    child: Text('Delete'),
-                    value: 'Delete',
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    child: Text('${index + 1}'),
                   ),
-                ],
+                  title: Text(
+                    item['title'] ?? '', // Handle null title
+                    style: TextStyle(
+                      decoration: item['is_completed']
+                          ? TextDecoration.lineThrough
+                          : null,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['description'] ?? '', // Handle null description
+                        style: TextStyle(color: Colors.white70),
+                      ),
+
+
+                    ],
+                  ),
+                  trailing: PopupMenuButton(
+                    onSelected: (value) {
+                      if (value == 'Edit') {
+                        navigateToEditPage(item);
+                      } else if (value == 'Delete') {
+                        deleteById(id);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        child: Text('Edit'),
+                        value: 'Edit',
+                      ),
+                      PopupMenuItem(
+                        child: Text('Delete'),
+                        value: 'Delete',
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
           },
         ),
+
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: navigateToAddPage,
-        label: const Text('Add To Do'),
-        icon: const Icon(Icons.add),
-        backgroundColor: Colors.blue,
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent, Colors.deepPurpleAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: navigateToAddPage,
+          label: Row(
+            children: [
+              const Icon(Icons.add, color: Colors.white, size: 24),
+              const SizedBox(width: 8),
+              const Text(
+                'Add To Do',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.transparent,
+          splashColor: Colors.deepPurpleAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+        ),
       ),
     );
+  }
+
+  Future<bool> showDeleteConfirmationDialog(BuildContext context, String id) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Delete Confirmation'),
+          content: Text('Are you sure you want to delete this item?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Cancel delete
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteById(id);
+                Navigator.of(context).pop(true); // Confirm delete
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    ).then((value) => value ?? false);
+  }
+
+  void navigateToEditPage(Map item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddToDoPage(todo: item)),
+    ).then((_) => fetchToDo()); // Refresh list after editing
   }
 
   void navigateToAddPage() {
@@ -105,6 +253,35 @@ class TodoListPageState extends State<TodoListPage> {
     }
   }
 
+  Future<void> markTaskAsCompleted(Map item) async {
+    final id = item['_id'];
+    final url = 'https://api.nstack.in/v1/todos/$id';
+    final body = jsonEncode({'is_completed': true});
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        body: body,
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        fetchToDo(); // Refresh the list to show updated task
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Task marked as completed')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to mark task as completed')),
+        );
+      }
+    } catch (error) {
+      print('Error marking task as completed: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error marking task as completed')),
+      );
+    }
+  }
+
   Future<void> fetchToDo() async {
     setState(() {
       isLoading = true;
@@ -115,9 +292,8 @@ class TodoListPageState extends State<TodoListPage> {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-        final result = jsonData['items'];
         setState(() {
-          items = result;
+          items = jsonData['items'];
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -134,5 +310,13 @@ class TodoListPageState extends State<TodoListPage> {
         isLoading = false;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _dateController.dispose();
+    super.dispose();
   }
 }

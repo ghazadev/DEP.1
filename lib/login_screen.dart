@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'todopage.dart';
+import 'package:to_do_list_app1/todopage.dart'; // Adjust the import path as per your project structure
 
 class LoginScreen extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => InitState();
+  State<StatefulWidget> createState() => _LoginScreenState();
 }
 
-class InitState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
+  final String correctPassword = "ghaza123"; // Define the correct password here
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return initWidget();
-  }
-
-  Widget initWidget() {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -23,7 +23,7 @@ class InitState extends State<LoginScreen> {
                 borderRadius: BorderRadius.only(bottomLeft: Radius.circular(90)),
                 color: Colors.blue,
                 gradient: LinearGradient(
-                  colors: [Colors.blueAccent, Colors.deepPurpleAccent],
+                  colors: [Colors.blue.shade800, Colors.deepPurple.shade800],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -38,13 +38,19 @@ class InitState extends State<LoginScreen> {
                       height: 120,
                       width: 120,
                     ),
-                    Container(
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
+                    Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                       ),
                     )
                   ],
@@ -52,105 +58,122 @@ class InitState extends State<LoginScreen> {
               ),
             ),
             Container(
-                margin: EdgeInsets.only(left:20,right:20,top:60),
-                padding: EdgeInsets.only(left: 20, right: 20),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: Colors.grey[200],
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(0,10),
-                        blurRadius: 50,
-                        color: Colors.blueAccent,
-                      ),
-                    ]
-                ),
-                alignment: Alignment.center,
-                child: TextField(
-                  cursorColor: Colors.indigo,
-                  decoration: InputDecoration(
-                      icon: Icon(
-                        Icons.email ,
-                        color: Colors.indigo,
-                      ),
-                      hintText: "Enter email",
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: Colors.grey[200],
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(0, 10),
+                    blurRadius: 50,
+                    color: Colors.blueAccent,
                   ),
-                )
+                ],
+              ),
+              alignment: Alignment.center,
+              child: TextField(
+                controller: _emailController,
+                cursorColor: Colors.indigo,
+                keyboardType: TextInputType.emailAddress, // Specify email keyboard type
+                decoration: InputDecoration(
+                  icon: Icon(
+                    Icons.email,
+                    color: Colors.indigo,
+                  ),
+                  hintText: "Enter email",
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                ),
+              ),
             ),
             Container(
-                margin: EdgeInsets.only(left:20,right:20,top:20),
-                padding: EdgeInsets.only(left: 20, right: 20),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: Colors.grey[200],
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(0,10),
-                        blurRadius: 50,
-                        color: Colors.blueAccent,
-                      ),
-                    ]
-                ),
-                alignment: Alignment.center,
-                child: TextField(
-                  obscureText: true,
-                  cursorColor: Colors.indigo,
-                  decoration: InputDecoration(
-                      icon: Icon(
-                        Icons.vpn_key ,
-                        color: Colors.indigo,
-                      ),
-                      hintText: "Enter password",
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: Colors.grey[200],
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(0, 10),
+                    blurRadius: 50,
+                    color: Colors.blueAccent,
                   ),
-                )
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 20,right: 20),
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                child: Text("Forget Password?"),
-                onTap: () {
-                  // Handle forgot password action here
-                },
+                ],
+              ),
+              alignment: Alignment.center,
+              child: TextField(
+                controller: _passwordController,
+                obscureText: true,
+                cursorColor: Colors.indigo,
+                keyboardType: TextInputType.text, // Specify text keyboard type (default)
+                textInputAction: TextInputAction.done, // Set action button to "Done"
+                decoration: InputDecoration(
+                  icon: Icon(
+                    Icons.vpn_key,
+                    color: Colors.indigo,
+                  ),
+                  hintText: "Enter password",
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                ),
               ),
             ),
             GestureDetector(
               onTap: () {
-                // Navigate to home page on login button tap
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => TodoListPage()),
-                );
+                // Check if the entered password is correct
+                if (_passwordController.text == correctPassword) {
+                  // Navigate to home page if the password is correct
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => TodoListPage()),
+                  );
+                } else {
+                  // Show error message if the password is incorrect
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Incorrect Password"),
+                        content: Text("Your password is wrong. Please try again."),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text("OK"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
               child: Container(
-                margin: EdgeInsets.only(left: 40,right: 40, top: 70),
-                padding: EdgeInsets.only(left: 20,right: 20),
+                margin: EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 alignment: Alignment.center,
                 height: 54,
                 decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blueAccent, Colors.deepPurpleAccent],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
+                  gradient: LinearGradient(
+                    colors: [Colors.blueAccent, Colors.deepPurpleAccent],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 10),
+                      blurRadius: 50,
+                      color: Colors.blueAccent,
                     ),
-                    borderRadius: BorderRadius.circular(50),
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(0,10),
-                        blurRadius: 50,
-                        color: Colors.blueAccent,
-                      ),
-                    ]
+                  ],
                 ),
                 child: Text(
                   "LOGIN",
                   style: TextStyle(
                     fontSize: 20,
-                    color:Colors.white,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -161,5 +184,3 @@ class InitState extends State<LoginScreen> {
     );
   }
 }
-
-
