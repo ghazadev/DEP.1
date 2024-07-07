@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart'; // Import for date formatting
-import 'package:to_do_list_app1/add_page.dart'; // Adjust import based on your project structure
-import 'package:to_do_list_app1/login_screen.dart'; // Adjust import based on your project structure
-
+import 'package:intl/intl.dart';
+import 'package:to_do_list_app1/add_page.dart';
+import 'package:to_do_list_app1/login_screen.dart';
 class TodoListPage extends StatefulWidget {
   const TodoListPage({Key? key}) : super(key: key);
 
@@ -71,7 +70,7 @@ class TodoListPageState extends State<TodoListPage> {
                   return showDeleteConfirmationDialog(context, id);
                 } else if (direction == DismissDirection.endToStart) {
                   markTaskAsCompleted(item);
-                  return Future.value(false); // Don't dismiss the item
+                  return Future.value(false);
                 }
                 return Future.value(false);
               },
@@ -98,7 +97,7 @@ class TodoListPageState extends State<TodoListPage> {
                     child: Text('${index + 1}'),
                   ),
                   title: Text(
-                    item['title'] ?? '', // Handle null title
+                    item['title'] ?? '',
                     style: TextStyle(
                       decoration: item['is_completed']
                           ? TextDecoration.lineThrough
@@ -197,14 +196,14 @@ class TodoListPageState extends State<TodoListPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false); // Cancel delete
+                Navigator.of(context).pop(false);
               },
               child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 deleteById(id);
-                Navigator.of(context).pop(true); // Confirm delete
+                Navigator.of(context).pop(true);
               },
               child: Text('Delete'),
             ),

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
+
 class AddToDoPage extends StatefulWidget {
   final Map? todo;
 
@@ -78,7 +79,7 @@ class AddToDoPageState extends State<AddToDoPage> {
                 child: ElevatedButton(
                   onPressed: isEdit ? updateData : submitData,
                   style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(Size(10, 50)),
+                    minimumSize: MaterialStateProperty.all(Size(200, 50)),
                     backgroundColor: MaterialStateProperty.all(Colors.deepPurple),
                   ),
                   child: Padding(
@@ -316,4 +317,3 @@ class AddToDoPageState extends State<AddToDoPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
-

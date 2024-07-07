@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_list_app1/todopage.dart'; // Adjust the import path as per your project structure
+import 'package:to_do_list_app1/todopage.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -7,7 +7,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final String correctPassword = "ghaza123"; // Define the correct password here
+  final String correctPassword = "ghaza123";
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: TextField(
                 controller: _emailController,
                 cursorColor: Colors.indigo,
-                keyboardType: TextInputType.emailAddress, // Specify email keyboard type
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   icon: Icon(
                     Icons.email,
@@ -106,8 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 obscureText: true,
                 cursorColor: Colors.indigo,
-                keyboardType: TextInputType.text, // Specify text keyboard type (default)
-                textInputAction: TextInputAction.done, // Set action button to "Done"
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
                   icon: Icon(
                     Icons.vpn_key,
