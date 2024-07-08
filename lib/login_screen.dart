@@ -11,6 +11,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  String? emailError;
+  String? passwordError;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.indigo,
                   ),
                   hintText: "Enter email",
+                  errorText: emailError,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
                 ),
@@ -114,6 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.indigo,
                   ),
                   hintText: "Enter password",
+                  errorText: passwordError,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
                 ),
@@ -121,14 +126,27 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             GestureDetector(
               onTap: () {
-                // Check if the entered password is correct
-                if (_passwordController.text == correctPassword) {
-                  // Navigate to home page if the password is correct
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => TodoListPage()),
-                  );
-                } else {
+                // Reset previous error messages
+                setState(() {
+                  emailError = null;
+                  passwordError = null;
+                });
+
+                // Check if email and password are not empty
+                if (_emailController.text.isEmpty && _passwordController.text.isEmpty) {
+                  setState(() {
+                    emailError = "Enter email";
+                    passwordError = "Enter password";
+                  });
+                } else if (_emailController.text.isEmpty) {
+                  setState(() {
+                    emailError = "Enter email";
+                  });
+                } else if (_passwordController.text.isEmpty) {
+                  setState(() {
+                    passwordError = "Enter password";
+                  });
+                } else if (_passwordController.text != correctPassword) {
                   // Show error message if the password is incorrect
                   showDialog(
                     context: context,
@@ -146,6 +164,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       );
                     },
+                  );
+                } else {
+                  // Navigate to home page if the password is correct
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => TodoListPage()),
                   );
                 }
               },

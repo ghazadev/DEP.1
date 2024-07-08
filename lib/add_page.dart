@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'notification_helper.dart  ';
 
 
 class AddToDoPage extends StatefulWidget {
@@ -275,6 +277,15 @@ class AddToDoPageState extends State<AddToDoPage> {
         descriptionController.text = '';
         dueDateController.text = '';
         showSuccessMessage(context, 'To-Do item added successfully');
+
+        // Schedule notification if due date is provided
+        if (dueDate.isNotEmpty) {
+          // Parse the due date string to DateTime
+          final dueDateTime = DateTime.parse(dueDate);
+
+          // Schedule notification using NotificationHelper
+          NotificationHelper.scheduleNotification(title, 'Reminder: $title', dueDateTime);
+        }
       } else {
         showErrorMessage(context, 'Failed to add To-Do item: ${response.body}');
       }
@@ -282,6 +293,10 @@ class AddToDoPageState extends State<AddToDoPage> {
       showErrorMessage(context, 'Error: $e');
     }
   }
+
+
+
+
 
   void showSuccessMessage(BuildContext context, String message) {
     final snackBar = SnackBar(

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_list_app1/notification_helper.dart';
 
 import 'package:to_do_list_app1/splash_screen.dart';
 
 
 Future main() async {
-
-
+WidgetsFlutterBinding.ensureInitialized();
+NotificationHelper.init();
   runApp(const MyApp());
 }
 
