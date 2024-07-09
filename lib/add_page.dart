@@ -245,10 +245,20 @@ class AddToDoPageState extends State<AddToDoPage> {
 
     if (response.statusCode == 200) {
       showSuccessMessage(context, 'To-Do item updated successfully');
+
+      // Schedule notification if due date is provided
+      if (dueDate.isNotEmpty) {
+        // Parse the due date string to DateTime
+        final dueDateTime = DateTime.parse(dueDate);
+
+        // Schedule notification using NotificationHelper
+        NotificationHelper.scheduleNotification(title, 'Reminder: $title', dueDateTime);
+      }
     } else {
       showErrorMessage(context, 'Update Failed: ${response.body}');
     }
   }
+
 
   Future<void> submitData() async {
     final title = titleController.text;

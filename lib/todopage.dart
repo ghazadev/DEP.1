@@ -110,7 +110,7 @@ class TodoListPageState extends State<TodoListPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item['description'] ?? '', // Handle null description
+                        item['description'] ?? '',
                         style: TextStyle(color: Colors.white70),
                       ),
 
